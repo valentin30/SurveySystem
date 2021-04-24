@@ -1,8 +1,9 @@
 import { Checkbox, CheckboxGroup } from '@chakra-ui/checkbox'
-import { Stack, Text } from '@chakra-ui/layout'
+import { Stack } from '@chakra-ui/layout'
 import { FunctionComponent } from 'react'
 import { PrimaryButtonColor, SecondaryTextColor } from '../../config/colors'
 import { Answer } from '../../dto/get/Answer'
+import { AnswerText } from './AnswerText'
 
 interface Props {
     answers: Answer[]
@@ -24,13 +25,7 @@ export const CheckBoxAnswerGroup: FunctionComponent<Props> = props => {
                             props.onChange(answer.id)
                         }}
                         colorScheme={PrimaryButtonColor}>
-                        <Text
-                            mt='0.1rem'
-                            fontWeight='semibold'
-                            fontSize='md'
-                            color={SecondaryTextColor}>
-                            {answer.content}
-                        </Text>
+                        <AnswerText>{answer.content}</AnswerText>
                     </Checkbox>
                 ))}
             </Stack>

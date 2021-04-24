@@ -45,7 +45,7 @@ public class SurveyService {
         }
 
         if (survey.isClosed()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            throw new ResponseStatusException(HttpStatus.LOCKED);
         }
 
         return DtoConverter.toGetSurveyResponse(survey);
@@ -141,6 +141,10 @@ public class SurveyService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
+        if(survey.isClosed()){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
         long requiredQuestions = survey.getQuestions().stream().filter(question -> question.isRequired()).count();
         if (requiredQuestions > submitSurveyRequest.getQuestions().size()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -198,5 +202,20 @@ public class SurveyService {
         });
 
         return answers;
+    }
+
+    public void modifySurvey(long id, User user){
+        Survey survey = surveyRepository.findById(id);
+
+        if(survey == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+
+        if(survey.getOwner().getId() != user.getId()){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+
+        survey.setClosed(!survey.isClosed());
+        surveyRepository.save(survey);
     }
 }

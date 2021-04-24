@@ -1,22 +1,18 @@
 import { Avatar } from '@chakra-ui/avatar'
-import { Box, Flex, Heading } from '@chakra-ui/layout'
+import { Flex, Heading } from '@chakra-ui/layout'
 import { useMediaQuery } from '@chakra-ui/media-query'
 import { FunctionComponent } from 'react'
-import {
-    BackgroundPrimary700,
-    BorderRadius,
-    PrimaryTextColor
-} from '../../../config/colors'
-import { UserDataResponse } from '../../../dto/user/UserDataResponse'
+import { PrimaryTextColor } from '../../../config/colors'
 import { useGetUserInfo } from '../../../hooks/HTTP/useGetUserInfo'
+import { Container } from '../../Box/Container'
 
 interface Props {}
 
 export const UserInfo: FunctionComponent<Props> = props => {
-    const userData: UserDataResponse | null = useGetUserInfo()
+    const { loading, userData } = useGetUserInfo()
     const [match] = useMediaQuery('(max-width: 1275px')
 
-    if (!userData) {
+    if (loading || !userData) {
         return null
     }
 
@@ -25,10 +21,8 @@ export const UserInfo: FunctionComponent<Props> = props => {
     }
 
     return (
-        <Box
+        <Container
             position='absolute'
-            backgroundColor={BackgroundPrimary700}
-            borderRadius={BorderRadius}
             left='100%'
             maxWidth='250px'
             width='100%'
@@ -46,6 +40,6 @@ export const UserInfo: FunctionComponent<Props> = props => {
                     {userData.name}
                 </Heading>
             </Flex>
-        </Box>
+        </Container>
     )
 }

@@ -71,4 +71,13 @@ public class SurveyController {
     ) {
         surveyService.submitSurveyAttendance(publicKey, submitSurveyRequest);
     }
+
+    @PutMapping("/{id}/close")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void closeSurvey(
+            @PathVariable long id,
+            @AuthenticationPrincipal User user
+    ) {
+        this.surveyService.modifySurvey(id, user);
+    }
 }

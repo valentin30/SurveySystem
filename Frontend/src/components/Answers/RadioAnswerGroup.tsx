@@ -1,8 +1,9 @@
-import { Stack, Text } from '@chakra-ui/layout'
+import { Stack } from '@chakra-ui/layout'
 import { Radio, RadioGroup } from '@chakra-ui/radio'
 import { FunctionComponent } from 'react'
 import { PrimaryButtonColor, SecondaryTextColor } from '../../config/colors'
 import { Answer } from '../../dto/get/Answer'
+import { AnswerText } from './AnswerText'
 
 interface Props {
     answers: Answer[]
@@ -25,14 +26,7 @@ export const RadioAnswerGroup: FunctionComponent<Props> = props => {
                         borderColor={SecondaryTextColor}
                         value={answer.id}
                         key={answer.id}>
-                        <Text
-                            cursor='pointer'
-                            mt='0.1rem'
-                            fontWeight='semibold'
-                            fontSize='md'
-                            color={SecondaryTextColor}>
-                            {answer.content}
-                        </Text>
+                        <AnswerText>{answer.content}</AnswerText>
                     </Radio>
                 ))}
             </Stack>

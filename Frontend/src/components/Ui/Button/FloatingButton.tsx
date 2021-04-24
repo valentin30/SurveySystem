@@ -9,7 +9,7 @@ import { SIGN_IN, SIGN_UP, SURVEY, USER } from '../../../utils/routes'
 import { MenuItem } from '../Menu/MenuItem'
 import { MenuList } from '../Menu/MenuList'
 
-export const FloadingButton: FunctionComponent = () => {
+export const FloatingButton: FunctionComponent = () => {
     const history = useHistory()
     const { token, logout } = useAuth()
 

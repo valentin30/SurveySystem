@@ -13,16 +13,25 @@ interface Params {
     privateKey: string
 }
 
+interface UseGetSurveyResults {
+    survey: SurveyResultsResponse | null
+    loading: boolean
+    toggleSurveyHandler: () => Promise<void>
+}
+
 export const useGetSurveyResults = (
     pathVariableName: PathVariable
-): SurveyResultsResponse | null => {
+): UseGetSurveyResults => {
     const { token } = useContext<IAuthContext>(AuthContext)
     const { [pathVariableName]: key } = useParams<Params>()
     const history = useHistory()
     const toast = useToast()
+    const [loading, setLoading] = useState(false)
     const [data, setData] = useState<SurveyResultsResponse | null>(null)
 
     const getSrviceResultsHandler = useCallback(async () => {
+        setLoading(true)
+
         if (pathVariableName === 'id' && !token) {
             history.replace(SIGN_IN + QUERY + TO + SURVEY + '/' + key + RESULTS)
             return
@@ -43,12 +52,44 @@ export const useGetSurveyResults = (
                 isClosable: true,
                 position: 'top-right'
             })
+        } finally {
+            setLoading(false)
         }
     }, [token, key, history, pathVariableName, toast])
+
+    const toggleSurveyHandler = useCallback(async () => {
+        if (!token || !data) {
+            return
+        }
+
+        try {
+            await SurveyService.modifySurvey(data.id, token)
+
+            setData(data => {
+                if (!data) {
+                    return data
+                }
+
+                return {
+                    ...data,
+                    closed: !data.closed
+                }
+            })
+        } catch (error) {
+            toast({
+                title: 'Error',
+                description: error.message,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+                position: 'top-right'
+            })
+        }
+    }, [token, data, toast])
 
     useEffect(() => {
         getSrviceResultsHandler()
     }, [getSrviceResultsHandler])
 
-    return data
+    return { survey: data, loading, toggleSurveyHandler }
 }

@@ -13,7 +13,7 @@ export const Layout: FunctionComponent = props => {
         <Box minHeight='full' background={BackgroundPrimary900}>
             {!mobile ? (
                 <Box
-                    position='absolute'
+                    position='fixed'
                     top='1.5rem'
                     left='1.5rem'
                     display='flex'

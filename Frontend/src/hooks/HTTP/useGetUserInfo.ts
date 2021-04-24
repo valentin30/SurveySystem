@@ -4,10 +4,15 @@ import { UserDataResponse } from '../../dto/user/UserDataResponse'
 import { UserService } from '../../service/UserService'
 import { useAuth } from '../useAuth'
 
-export const useGetUserInfo = (): UserDataResponse | null => {
+interface UseGetUserInfo {
+    userData: UserDataResponse | null
+    loading: boolean
+}
+
+export const useGetUserInfo = (): UseGetUserInfo => {
     const { token } = useAuth()
     const toast = useToast()
-
+    const [loading, setLoading] = useState<boolean>(false)
     const [userData, setUserData] = useState<UserDataResponse | null>(null)
 
     const getUserInfo = useCallback(async () => {
@@ -15,6 +20,8 @@ export const useGetUserInfo = (): UserDataResponse | null => {
             setUserData(null)
             return
         }
+
+        setLoading(true)
 
         try {
             setUserData(await UserService.getUserInformation(token))
@@ -27,6 +34,8 @@ export const useGetUserInfo = (): UserDataResponse | null => {
                 isClosable: true,
                 position: 'top-right'
             })
+        } finally {
+            setLoading(false)
         }
     }, [token, toast])
 
@@ -34,5 +43,5 @@ export const useGetUserInfo = (): UserDataResponse | null => {
         getUserInfo()
     }, [getUserInfo])
 
-    return userData
+    return { userData, loading }
 }

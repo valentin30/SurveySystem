@@ -1,4 +1,3 @@
-import { Button } from '@chakra-ui/button'
 import { Box } from '@chakra-ui/layout'
 import { ChangeEventHandler, FormEventHandler, FunctionComponent } from 'react'
 import { Question } from '../../pages/CreateSurvey'

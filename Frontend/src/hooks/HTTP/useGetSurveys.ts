@@ -1,19 +1,22 @@
 import { useToast } from '@chakra-ui/toast'
-import { ChangeEvent, useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { SurveyLink } from '../../dto/get/SurveyLink'
 import { SurveysResponse } from '../../dto/get/SurveysResponse'
 import { SurveyService } from '../../service/SurveyService'
-import { useInput } from '../useInput'
 
 interface UseGetSurveys {
     surveys: SurveyLink[] | null
+    loading: boolean
 }
 
 export const useGetSurveys = (): UseGetSurveys => {
     const toast = useToast()
     const [surveys, setSurveys] = useState<SurveyLink[] | null>(null)
+    const [loading, setLoading] = useState<boolean>(false)
 
     const getSurveys = useCallback(async () => {
+        setLoading(true)
+
         try {
             const {
                 surveys
@@ -28,6 +31,8 @@ export const useGetSurveys = (): UseGetSurveys => {
                 isClosable: true,
                 position: 'top-right'
             })
+        } finally {
+            setLoading(false)
         }
     }, [toast])
 
@@ -35,5 +40,5 @@ export const useGetSurveys = (): UseGetSurveys => {
         getSurveys()
     }, [getSurveys])
 
-    return { surveys }
+    return { surveys, loading }
 }

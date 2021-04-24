@@ -12,6 +12,7 @@ import { SurveyResultsResponse } from '../dto/results/SurveyResultsResponse'
 import { SubmitSurveyRequest } from '../dto/submit/SubmitSurveyRequest'
 import { UserSurveysResponse } from '../dto/user/UserSurveysResponse'
 import {
+    CLOSE,
     CREATE_SURVEY,
     CREATE_SURVEY_NO_AUTH,
     NO_AUTH,
@@ -24,6 +25,10 @@ import {
 export class SurveyService {
     static async getSurveys(): Promise<SurveysResponse> {
         const response: Response = await fetch(SURVEY_URL)
+
+        if (response.status === 400) {
+            throw new Error('Plaese make sure you provide all the information!')
+        }
 
         if (!response.ok) {
             throw new Error(String(response.status))
@@ -38,6 +43,18 @@ export class SurveyService {
         publicKey: string
     ): Promise<SurveyResponse> {
         const response: Response = await fetch(SURVEY_URL + '/' + publicKey)
+
+        if (response.status === 400) {
+            throw new Error('Plaese make sure you provide all the information!')
+        }
+
+        if (response.status === 404) {
+            throw new Error('This survey does not exists!')
+        }
+
+        if (response.status === 423) {
+            throw new Error("This survey was closed by it's owner!")
+        }
 
         if (!response.ok) {
             throw new Error(String(response.status))
@@ -69,11 +86,30 @@ export class SurveyService {
             }
         )
 
+        if (response.status === 400) {
+            throw new Error('Plaese make sure you provide all the information!')
+        }
+
+        if (response.status === 404) {
+            throw new Error('This survey does not exists!')
+        }
+
+        if (response.status === 403) {
+            throw new Error('This survey does not belong to you!')
+        }
+
         if (!response.ok) {
             throw new Error(String(response.status))
         }
 
         const surveyResult: SurveyResultsResponse = await response.json()
+
+        surveyResult.questions = surveyResult.questions.sort(
+            (a: Question, b: Question) => a.id - b.id
+        )
+        surveyResult.questions.forEach((question: Question) =>
+            question.answers.sort((a: Answer, b: Answer) => a.id - b.id)
+        )
 
         return surveyResult
     }
@@ -84,6 +120,14 @@ export class SurveyService {
         const response: Response = await fetch(
             SURVEY_URL + '/' + privateKey + RESULTS + NO_AUTH
         )
+
+        if (response.status === 400) {
+            throw new Error('Plaese make sure you provide all the information!')
+        }
+
+        if (response.status === 404) {
+            throw new Error('This survey does not exists!')
+        }
 
         if (!response.ok) {
             throw new Error(String(response.status))
@@ -101,6 +145,18 @@ export class SurveyService {
                 Authorization: token
             }
         })
+
+        if (response.status === 400) {
+            throw new Error('Plaese make sure you provide all the information!')
+        }
+
+        if (response.status === 404) {
+            throw new Error('You have no surveys!')
+        }
+
+        if (response.status === 403) {
+            throw new Error('This survey does not belong to you!')
+        }
 
         if (!response.ok) {
             throw new Error(String(response.status))
@@ -124,6 +180,14 @@ export class SurveyService {
             body: JSON.stringify(body)
         })
 
+        if (response.status === 400) {
+            throw new Error('Plaese make sure you provide all the information!')
+        }
+
+        if (response.status === 403) {
+            throw new Error('This survey does not belong to you!')
+        }
+
         if (!response.ok) {
             throw new Error(String(response.status))
         }
@@ -143,6 +207,10 @@ export class SurveyService {
             },
             body: JSON.stringify(body)
         })
+
+        if (response.status === 400) {
+            throw new Error('Plaese make sure you provide all the information!')
+        }
 
         if (!response.ok) {
             throw new Error(String(response.status))
@@ -168,8 +236,41 @@ export class SurveyService {
             }
         )
 
-        return response.status === 201
+        if (response.status === 404) {
+            throw new Error('This survey does not exists!')
+        }
+
+        if (response.status === 403) {
+            throw new Error("This survey was closed by it's owner!")
+        }
+
+        if (!response.ok) {
+            throw new Error(String(response.status))
+        }
+
+        return true
     }
 
-    static async modifySurvey() {}
+    static async modifySurvey(id: number, token: string): Promise<boolean> {
+        const response: Response = await fetch(SURVEY_URL + '/' + id + CLOSE, {
+            method: 'PUT',
+            headers: {
+                Authorization: token
+            }
+        })
+
+        if (response.status === 404) {
+            throw new Error('This survey does not exists!')
+        }
+
+        if (response.status === 403) {
+            throw new Error('This survey does not belong to you!')
+        }
+
+        if (!response.ok) {
+            throw new Error(String(response.status))
+        }
+
+        return true
+    }
 }

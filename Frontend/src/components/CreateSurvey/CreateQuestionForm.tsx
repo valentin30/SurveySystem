@@ -16,6 +16,7 @@ import {
     SecondaryTextColor
 } from '../../config/colors'
 import { Question } from '../../pages/CreateSurvey'
+import { Container } from '../Box/Container'
 import { TextField } from '../Ui/Input/TextField'
 
 interface Props {
@@ -85,11 +86,7 @@ export const CreateQuestionForm: ForwardRefExoticComponent<
                     </Stack>
                 </FormControl>
             </Box>
-            <Box
-                backgroundColor={BackgroundPrimary800}
-                borderRadius={BorderRadius}
-                mb='1.5rem'
-                padding='1.5rem'>
+            <Container mb='1.5rem'>
                 <FormControl isRequired>
                     <FormLabel mb='1rem' color={PrimaryTextColor}>
                         {props.index}. Answers
@@ -123,7 +120,7 @@ export const CreateQuestionForm: ForwardRefExoticComponent<
                         Add Answer
                     </Button>
                 </FormControl>
-            </Box>
+            </Container>
         </>
     )
 })

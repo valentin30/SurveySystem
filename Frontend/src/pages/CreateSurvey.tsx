@@ -1,6 +1,6 @@
 import { Button } from '@chakra-ui/button'
 import { Box, Heading } from '@chakra-ui/layout'
-import { toast, useToast } from '@chakra-ui/toast'
+import { useToast } from '@chakra-ui/toast'
 import React, {
     FormEvent,
     FunctionComponent,
@@ -11,7 +11,7 @@ import React, {
 } from 'react'
 import { FirstStep } from '../components/CreateSurvey/FirstStep'
 import { SecondStep } from '../components/CreateSurvey/SecondStep'
-import { SurveyLinks } from '../components/Survey/SurveyLinks'
+import { SurveyLinks } from '../components/Links/SurveyLinks'
 import { AlertDialog } from '../components/Ui/AlertDialog'
 import { PrimaryButton } from '../components/Ui/Button/PrimaryButton'
 import { Loader } from '../components/Ui/Loader'

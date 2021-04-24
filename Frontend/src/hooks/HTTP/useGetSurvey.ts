@@ -10,16 +10,19 @@ interface UseGetSurvey {
     answers: SubmittedQuestion[] | null
     onRadioChange: (id: number) => (value: string) => void
     onCheckboxChange: (id: number) => (answerId: number) => void
+    loading: boolean
 }
 
 export const useGetSurvey = (publicKey: string): UseGetSurvey => {
     const toast = useToast()
 
     const [survey, setSurvey] = useState<SurveyResponse | null>(null)
-
+    const [loading, setLoading] = useState(false)
     const [answers, setAnswers] = useState<SubmittedQuestion[]>([])
 
     const getSurvey = useCallback(async () => {
+        setLoading(true)
+
         try {
             const survey: SurveyResponse = await SurveyService.getSurveyByPublicKey(
                 publicKey
@@ -39,6 +42,8 @@ export const useGetSurvey = (publicKey: string): UseGetSurvey => {
                 isClosable: true,
                 position: 'top-right'
             })
+        } finally {
+            setLoading(false)
         }
     }, [publicKey, toast])
 
@@ -89,5 +94,5 @@ export const useGetSurvey = (publicKey: string): UseGetSurvey => {
         getSurvey()
     }, [getSurvey])
 
-    return { survey, answers, onCheckboxChange, onRadioChange }
+    return { survey, answers, onCheckboxChange, onRadioChange, loading }
 }

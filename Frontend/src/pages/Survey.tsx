@@ -1,18 +1,15 @@
 import { FormControl, FormLabel } from '@chakra-ui/form-control'
 import { Box, Heading, Text } from '@chakra-ui/layout'
 import { useToast } from '@chakra-ui/toast'
-import { FormEvent, FunctionComponent, useCallback } from 'react'
+import { FormEvent, FunctionComponent, useCallback, useState } from 'react'
 import { useParams } from 'react-router'
 import { CheckBoxAnswerGroup } from '../components/Answers/CheckBoxAnswerGroup'
 import { RadioAnswerGroup } from '../components/Answers/RadioAnswerGroup'
+import { Container } from '../components/Box/Container'
 import { PrimaryButton } from '../components/Ui/Button/PrimaryButton'
+import { PrimaryButtonLink } from '../components/Ui/Button/PrimaryButtonLink'
 import { Loader } from '../components/Ui/Loader'
-import {
-    BackgroundPrimary800,
-    BorderRadius,
-    PrimaryTextColor,
-    SecondaryTextColor
-} from '../config/colors'
+import { PrimaryTextColor, SecondaryTextColor } from '../config/colors'
 import { Question } from '../dto/get/Question'
 import { SubmittedQuestion } from '../dto/submit/SubmittedQuestion'
 import { useGetSurvey } from '../hooks/HTTP/useGetSurvey'
@@ -25,6 +22,9 @@ interface Params {
 export const Survey: FunctionComponent = () => {
     const { publicKey } = useParams<Params>()
 
+    const [success, setSuccess] = useState<boolean>(false)
+    const [loading, setLoading] = useState<boolean>(false)
+
     const { survey, answers, onCheckboxChange, onRadioChange } = useGetSurvey(
         publicKey
     )
@@ -34,11 +34,12 @@ export const Survey: FunctionComponent = () => {
     const submitHandler = useCallback(
         async (event: FormEvent) => {
             event.preventDefault()
+            setLoading(true)
             try {
-                const success: boolean = await SurveyService.submitSurvey(
-                    publicKey,
-                    { questions: answers ?? [] }
-                )
+                await SurveyService.submitSurvey(publicKey, {
+                    questions: answers ?? []
+                })
+                setSuccess(true)
             } catch (error) {
                 toast({
                     title: 'Error',
@@ -48,12 +49,14 @@ export const Survey: FunctionComponent = () => {
                     isClosable: true,
                     position: 'top-right'
                 })
+            } finally {
+                setLoading(false)
             }
         },
         [answers, publicKey, toast]
     )
 
-    if (!survey) {
+    if (loading) {
         return (
             <Loader
                 position='fixed'
@@ -65,20 +68,36 @@ export const Survey: FunctionComponent = () => {
         )
     }
 
+    if (!survey) {
+        return null
+    }
+
+    if (success) {
+        return (
+            <Box pt='20vh'>
+                <Container>
+                    <Heading color={PrimaryTextColor} size='xl' mb='2rem'>
+                        Your response <br /> was saved successfully.
+                    </Heading>
+                    <PrimaryButtonLink size='lg' to='/'>
+                        Back To Home
+                    </PrimaryButtonLink>
+                </Container>
+            </Box>
+        )
+    }
+
     return (
         <Box pt='3rem' pb='3rem' as='form' onSubmit={submitHandler}>
-            <Box
-                background={BackgroundPrimary800}
-                padding='1.5rem'
-                borderRadius={BorderRadius}>
+            <Container>
                 <Heading color={PrimaryTextColor} size='xl'>
                     {survey.title}
                 </Heading>
                 <Text mt='0.5rem' color={SecondaryTextColor}>
                     {survey.subtitle}
                 </Text>
-            </Box>
-            {survey.questions.map((question: Question) => {
+            </Container>
+            {survey.questions.map((question: Question, index: number) => {
                 const answer: SubmittedQuestion | undefined = answers?.find(
                     a => a.id === question.id
                 )
@@ -88,19 +107,14 @@ export const Survey: FunctionComponent = () => {
                 }
 
                 return (
-                    <Box
-                        key={question.id}
-                        mt='1.5rem'
-                        background={BackgroundPrimary800}
-                        padding='1.5rem'
-                        borderRadius={BorderRadius}>
+                    <Container key={question.id} mt='1.5rem'>
                         <FormControl isRequired={question.isRequired}>
                             <FormLabel display='flex'>
                                 <Heading
                                     color={PrimaryTextColor}
                                     size='md'
                                     mb='1rem'>
-                                    {question.content}
+                                    {index + 1}. {question.content}
                                 </Heading>
                             </FormLabel>
 
@@ -118,16 +132,12 @@ export const Survey: FunctionComponent = () => {
                                 />
                             )}
                         </FormControl>
-                    </Box>
+                    </Container>
                 )
             })}
-            <Box
-                background={BackgroundPrimary800}
-                padding='1.5rem'
-                mt='1.5rem'
-                borderRadius={BorderRadius}>
+            <Container mt='1.5rem'>
                 <PrimaryButton type='submit'>Submit</PrimaryButton>
-            </Box>
+            </Container>
         </Box>
     )
 }

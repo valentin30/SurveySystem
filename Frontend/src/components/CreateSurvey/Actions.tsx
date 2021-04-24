@@ -1,11 +1,7 @@
 import { Button } from '@chakra-ui/button'
-import { Box } from '@chakra-ui/layout'
 import { FunctionComponent } from 'react'
-import {
-    BackgroundPrimary800,
-    BorderRadius,
-    PrimaryTextColor
-} from '../../config/colors'
+import { PrimaryTextColor } from '../../config/colors'
+import { Container } from '../Box/Container'
 import { PrimaryButton } from '../Ui/Button/PrimaryButton'
 
 interface Props {
@@ -14,10 +10,7 @@ interface Props {
 
 export const Actions: FunctionComponent<Props> = props => {
     return (
-        <Box
-            backgroundColor={BackgroundPrimary800}
-            borderRadius={BorderRadius}
-            padding='1.5rem'>
+        <Container>
             <Button
                 mr='1.5rem'
                 onClick={props.onStepBack}
@@ -25,6 +18,6 @@ export const Actions: FunctionComponent<Props> = props => {
                 Back
             </Button>
             <PrimaryButton type='submit'>Publish Survey</PrimaryButton>
-        </Box>
+        </Container>
     )
 }

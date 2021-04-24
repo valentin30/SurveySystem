@@ -10,8 +10,12 @@ export class UserService {
             }
         })
 
+        if (response.status === 400) {
+            throw new Error('Plaese make sure you provide all the information!')
+        }
+
         if (!response.ok) {
-            throw new Error()
+            throw new Error('Not Authenticated!')
         }
 
         const data: UserDataResponse = await response.json()
